@@ -462,10 +462,6 @@ static int usb_scan_device_configs(struct mxt_device *mxt)
 {
   int i, ret;
 
-  if (mxt->usb.bridge_chip && mxt->usb.desc.bNumConfigurations == 1) {
-    return usb_scan_for_qrg_if(mxt);
-  }
-
   /* Scan through interfaces */
   for (i = 0; i < mxt->usb.desc.bNumConfigurations; ++i) {
     struct libusb_config_descriptor *config;
@@ -479,6 +475,10 @@ static int usb_scan_device_configs(struct mxt_device *mxt)
         // Found interface number
         return ret;
     }
+  }
+
+  if (mxt->usb.bridge_chip && mxt->usb.desc.bNumConfigurations == 1) {
+    return usb_scan_for_qrg_if(mxt);
   }
 
   return MXT_ERROR_NO_DEVICE;
