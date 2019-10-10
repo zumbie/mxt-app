@@ -398,7 +398,8 @@ static int usb_scan_for_control_if(struct mxt_device *mxt,
   int j, k, ret;
   char buf[128];
   const char control_if_mxt[] = "Atmel maXTouch Control";
-  const char control_if_tnx[] = "TNxPB-004 Digitizer Control";
+  const char control_if_tnx1[] = "TNxPB-004 Digitizer Control";
+  const char control_if_tnx2[] = "TNxPB-002 Digitizer Control";
   const char bootloader_if[] = "Atmel maXTouch Bootloader";
 
   for (j = 0; j < config->bNumInterfaces; j++) {
@@ -419,7 +420,7 @@ static int usb_scan_for_control_if(struct mxt_device *mxt,
 	    mxt->usb.ep1_in_use_max_packet_size = false;
 	    mxt->usb.request_ep = ENDPOINT_2_OUT;
             return MXT_SUCCESS;
-	  } else if (!strncmp(buf, control_if_tnx, sizeof(control_if_tnx))) {
+	  } else if (!strncmp(buf, control_if_tnx1, sizeof(control_if_tnx1))) {
             mxt_dbg(mxt->ctx, "Found %s at interface %d altsetting %d",
                     buf, altsetting->bInterfaceNumber, altsetting->bAlternateSetting);
 
@@ -427,6 +428,15 @@ static int usb_scan_for_control_if(struct mxt_device *mxt,
             mxt->usb.interface = altsetting->bInterfaceNumber;
 	    mxt->usb.ep1_in_use_max_packet_size = true;
 	    mxt->usb.request_ep = ENDPOINT_1_OUT;
+            return MXT_SUCCESS;
+	  } else if (!strncmp(buf, control_if_tnx2, sizeof(control_if_tnx2))) {
+            mxt_dbg(mxt->ctx, "Found %s at interface %d altsetting %d",
+                    buf, altsetting->bInterfaceNumber, altsetting->bAlternateSetting);
+
+            mxt->usb.bootloader = false;
+            mxt->usb.interface = altsetting->bInterfaceNumber;
+	    mxt->usb.ep1_in_use_max_packet_size = true;
+	    mxt->usb.request_ep = ENDPOINT_2_OUT;
             return MXT_SUCCESS;
           } else if (!strncmp(buf, bootloader_if, sizeof(bootloader_if))) {
             mxt_dbg(mxt->ctx, "Found %s at interface %d altsetting %d",
